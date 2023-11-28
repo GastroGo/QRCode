@@ -2,6 +2,7 @@ package com.example.qrcodegenerator;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -9,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,23 +18,58 @@ import com.example.qrcodegenerator.databinding.ActivityMainBinding;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.io.Console;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-
     private ActivityMainBinding binding;
-    String[] id = new String[] {
-        "hsh3j5k2051", "fd23vsd2016", "zd53uhi6120"
-    };
+    private List<String> allIds = new ArrayList<>();
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     showCamera();
-                }
-                else {
-
+                } else {
+                    // Handle the case where camera permission is not granted
+                    Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show();
                 }
             });
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initBinding();
+        initViews();
+        readAllID();
+    }
+
+    private void readAllID() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Restaurants");
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    // Durchlaufe alle Kinder unter "Restaurants"
+                    String id = snapshot.getKey();
+                    allIds.add(id);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Error reading IDs from Firebase", databaseError.toException());
+            }
+        });
+    }
 
     private ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() == null) {
@@ -41,23 +78,6 @@ public class MainActivity extends AppCompatActivity {
             checkRestaurantID(result.getContents());
         }
     });
-
-    private void checkRestaurantID(String idDatabase) {
-
-        for (String id : id) {
-            if(id.equals(idDatabase)) {
-
-                getData(id.substring(0,7));
-                String idTable = id.substring(7);
-            } else {
-                Toast.makeText(this, "Keine ID gefunden", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void getData(String idRestaurant){
-        // ID request database
-    }
 
     private void showCamera() {
         ScanOptions options = new ScanOptions();
@@ -69,13 +89,6 @@ public class MainActivity extends AppCompatActivity {
         options.setOrientationLocked(false);
 
         qrCodeLauncher.launch(options);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initBinding();
-        initViews();
     }
 
     private void initViews() {
@@ -101,4 +114,21 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
     }
+
+    private void checkRestaurantID(String idDatabase) {
+        for (String id : allIds) {
+            id = id.substring(1);
+            if (id.equals(idDatabase)) {
+                getDataForId(id);
+            }
+        }
+
+        // If no match is found
+        Toast.makeText(this, "No matching ID found", Toast.LENGTH_SHORT).show();
+    }
+
+    private void getDataForId(String id) {
+
+    }
 }
+
