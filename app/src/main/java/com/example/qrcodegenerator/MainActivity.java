@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         // If no match is found
         Toast.makeText(this, "No matching ID found", Toast.LENGTH_SHORT).show();
     }
-
     private void getDataForId(String id) {
         DatabaseReference dbRestaurant = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id);
 
@@ -150,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     Intent intent = new Intent(MainActivity.this, MainActivity2.class);
-                    intent.putExtra("selectedRestaurant", speisekarte1);
+                    intent.putExtra("selectedSpeisekarte", speisekarte1);
                     startActivity(intent);
                 } else {
                     // Handle the case where the data does not exist
@@ -164,4 +163,3 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 }
-
