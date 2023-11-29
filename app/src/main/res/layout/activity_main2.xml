@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity2">
+
+    <EditText
+        android:id="@+id/editTextGericht"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Gericht"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/editTextPreis"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Preis"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/editTextAllergien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Allergien"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/editTextZutaten"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Zutaten"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Speichern" />
+
+    <Button
+        android:id="@+id/delete_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Löschen" />
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zurück" />
+
+</LinearLayout>

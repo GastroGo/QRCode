@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -117,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkRestaurantID(String idDatabase) {
         for (String id : allIds) {
-            id = id.substring(1);
+            Toast.makeText(this, id, Toast.LENGTH_SHORT).show();
+            //id = id.substring(1);
             if (id.equals(idDatabase)) {
                 getDataForId(id);
             }
@@ -128,7 +130,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getDataForId(String id) {
+        DatabaseReference dbRestaurant = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id);
 
+        dbRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Speisekarte1 speisekarte1 = new Speisekarte1();
+                    speisekarte1.setId(id);
+                    speisekarte1.setGericht(dataSnapshot.child("gericht").getValue(String.class));
+                    speisekarte1.setAllergien(dataSnapshot.child("allergien").getValue(String.class));
+                    speisekarte1.setZutaten(dataSnapshot.child("zutaten").getValue(String.class));
+
+                    Integer preis = dataSnapshot.child("preis").getValue(Integer.class);
+                    if (preis != null) {
+                        speisekarte1.setPreis(preis);
+                    } else {
+                        // Handle the case where the price is null
+                    }
+
+                    Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                    intent.putExtra("selectedRestaurant", speisekarte1);
+                    startActivity(intent);
+                } else {
+                    // Handle the case where the data does not exist
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle the case where the read operation failed
+            }
+        });
     }
 }
 
