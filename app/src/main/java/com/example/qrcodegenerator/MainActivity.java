@@ -1,7 +1,6 @@
 package com.example.qrcodegenerator;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private final List<String> allIds = new ArrayList<>();
     List<String> allAllergien = new ArrayList<>();
     List<String> allZutaten = new ArrayList<>();
+    List<String> allGerichte = new ArrayList<>();
 
 
     private final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(new ScanContract(), result -> {
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
             checkRestaurantID(result.getContents());
         }
     });
+
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -113,36 +114,70 @@ public class MainActivity extends AppCompatActivity {
     private void checkRestaurantID(String idDatabase) {
         for (String id : allIds) {
             if (id.equals(idDatabase)) {
-                getDataForId(id);
+                getAllGerichte(id);
             }
         }
     }
 
+    private void getAllGerichte(String id) {
+        DatabaseReference dbGerichte = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id);
 
-    private void getDataForId(String id) {
-
-        DatabaseReference dbRestaurant = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id);
-        dbRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+        dbGerichte.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Speisekarte speisekarte1 = new Speisekarte();
-                    speisekarte1.setId(id);
-                    speisekarte1.setGericht(dataSnapshot.child("Gericht").getValue(String.class));
-                    speisekarte1.setPreis(dataSnapshot.child("Preis").getValue(Double.class));
-
-                    showDataInToast(speisekarte1);
-                    getDataAllergien(id, speisekarte1);
-                    getDataZutaten(id, speisekarte1);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String gericht = snapshot.getKey();
+                    allGerichte.add(gericht);
                 }
+                getDataGericht(id);
             }
-
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Error reading IDs from Firebase", databaseError.toException());
+            }
         });
     }
 
-    private void getDataAllergien(String id, Speisekarte speisekarte){
+    int index = 0;
+    private void getDataGericht(String id) {
+        for(String gericht : allGerichte) {
+
+            DatabaseReference dbGerichte = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id).child(gericht);
+            dbGerichte.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        Gericht[] gericht = new Gericht[allGerichte.size()];
+
+                        gericht[index] = new Gericht();  // Initialisierung eines neuen Gericht-Objekts
+                        gericht[index].setGerichtName(snapshot.child("Name").getValue(String.class));
+                        gericht[index].setPreis(snapshot.child("Preis").getValue(String.class));
+                        getDataAllergien(id, gericht[index]);
+                        getDataZutaten(id, gericht[index]);
+
+
+                        if (gericht[index].getGerichtName() != null) {
+                            Toast.makeText(MainActivity.this, gericht[index].getGerichtName(), Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (gericht[index].getPreis() != null) {
+                            Toast.makeText(MainActivity.this, gericht[index].getPreis(), Toast.LENGTH_SHORT).show();
+                        }
+
+                        index++;
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
+    }
+
+
+    private void getDataAllergien(String id, Gericht gericht){
 
         DatabaseReference dbAllergien = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id).child("Allergien");
         dbAllergien.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -153,18 +188,15 @@ public class MainActivity extends AppCompatActivity {
                         String allergie = snapshotAl.getKey();
                         allAllergien.add(allergie);
                     }
-                    speisekarte.setAllergien(allAllergien);
+                    gericht.setAllergien(allAllergien);
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
-    private void getDataZutaten(String id, Speisekarte speisekarte){
+    private void getDataZutaten(String id, Gericht gericht){
         DatabaseReference dbZutaten = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id).child("Zutaten");
         dbZutaten.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -174,20 +206,12 @@ public class MainActivity extends AppCompatActivity {
                         String zutaten = snapshotAl.getKey();
                         allZutaten.add(zutaten);
                     }
-                    speisekarte.setZutaten(allZutaten);
+                    gericht.setZutaten(allZutaten);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
-    }
-
-
-    private void showDataInToast(Speisekarte speisekarte) {
-        Toast.makeText(this, "Gericht: " + speisekarte.getGericht(), Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "Preis: " + speisekarte.getPreis(), Toast.LENGTH_SHORT).show();
     }
 }
