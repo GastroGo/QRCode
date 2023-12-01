@@ -1,15 +1,17 @@
 package com.example.qrcodegenerator;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Speisekarte implements Serializable {
-    private String id, gericht, allergien, zutaten;
-    private int preis;
+    private String id, gericht;
+    private List<String> allergien, zutaten;
+    private double preis;
 
 
     public Speisekarte() {}
 
-    public Speisekarte(String id, int preis, String gericht, String allergien, String zutaten) {
+    public Speisekarte(String id, double preis, String gericht, List<String> allergien, List<String> zutaten) {
         this.id = id;
         this.preis = preis;
         this.gericht = gericht;
@@ -25,11 +27,11 @@ public class Speisekarte implements Serializable {
         this.id = id;
     }
 
-    public int getPreis() {
+    public double getPreis() {
         return preis;
     }
 
-    public void setPreis(int preis) {
+    public void setPreis(double preis) {
         this.preis = preis;
     }
 
@@ -41,21 +43,22 @@ public class Speisekarte implements Serializable {
         this.gericht = gericht;
     }
 
-    public String getAllergien() {
+    public List<String> getAllergien() {
         return allergien;
     }
 
-    public void setAllergien(String allergien) {
+    public void setAllergien(List<String> allergien) {
         this.allergien = allergien;
     }
 
-    public String getZutaten() {
+    public List<String> getZutaten() {
         return zutaten;
     }
 
-    public void setZutaten(String zutaten) {
+    public void setZutaten(List<String> zutaten) {
         this.zutaten = zutaten;
     }
+
 
     @Override
     public String toString() {
