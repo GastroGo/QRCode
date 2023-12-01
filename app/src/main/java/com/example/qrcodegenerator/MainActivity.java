@@ -54,12 +54,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readAllID() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Restaurants");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Speisekarten");
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {      // Durchlaufe alle Kinder unter "Restaurants"
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {      // Durchlaufe alle Kinder unter "Speisekarten"
                     String id = snapshot.getKey();
                     allIds.add(id);
                 }
@@ -130,17 +130,21 @@ public class MainActivity extends AppCompatActivity {
                     speisekarte1.setZutaten(dataSnapshot.child("zutaten").getValue(String.class));
 
                     Integer preis = dataSnapshot.child("preis").getValue(Integer.class);
-                    if (preis != null) {
-                        speisekarte1.setPreis(preis);
-                    }
-                    Intent intent = new Intent(MainActivity.this, MainActivity2.class);
-                    intent.putExtra("selectedSpeisekarte", speisekarte1);
-                    startActivity(intent);
+                    showDataInToast(speisekarte1);
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+    }
+    private void showDataInToast(Speisekarte speisekarte) {
+        String toastMessage = "ID: " + speisekarte.getId() +
+                "\nGericht: " + speisekarte.getGericht() +
+                "\nAllergien: " + speisekarte.getAllergien() +
+                "\nZutaten: " + speisekarte.getZutaten() +
+                "\nPreis: " + speisekarte.getPreis();
+
+        Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
     }
 }
