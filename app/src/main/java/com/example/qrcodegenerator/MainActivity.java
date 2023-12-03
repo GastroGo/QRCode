@@ -1,6 +1,7 @@
 package com.example.qrcodegenerator;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +30,10 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private final List<String> allIds = new ArrayList<>();
-    List<String> allAllergien = new ArrayList<>();
     List<String> allZutaten = new ArrayList<>();
+    List<String> allAllergien = new ArrayList<>();
     List<String> allGerichte = new ArrayList<>();
+    List<Gericht> gerichtList = new ArrayList<>();
     int index;
 
 
@@ -158,20 +161,21 @@ public class MainActivity extends AppCompatActivity {
                         gericht[index] = new Gericht();  // Initialisierung eines neuen Gericht-Objekts
                         gericht[index].setGerichtName(snapshot.child("gericht").getValue(String.class));
                         gericht[index].setPreis(snapshot.child("preis").getValue(Double.class));
-                        getDataAllergien(id, gericht[index], gerichtSelected);
-                        getDataZutaten(id, gericht[index], gerichtSelected);
+                        getDataAllergien(id, gerichtSelected, gericht[index]);
 
 
-                        if (gericht[index].getGerichtName() != null) {
-                            //Toast.makeText(MainActivity.this, "GerichtName: " + gericht[index].getGerichtName(), Toast.LENGTH_SHORT).show();
-                        }
 
-                        if (gericht[index].getPreis() != null) {
-                            //Toast.makeText(MainActivity.this, "GerichtPreis: " + gericht[index].getPreis().toString(), Toast.LENGTH_SHORT).show();
-                        }
+
+                        //gericht[index].setZutaten(getDataZutaten(id, gerichtSelected));
+
+                        gerichtList.add(gericht[index]);
 
                         index++;
+                        if (index == allGerichte.size()) {
+                            activityAufruf();
+                        }
                     }
+
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
@@ -183,34 +187,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void getDataAllergien(String id, Gericht gericht, String gerichtSelected){
+    private void getDataAllergien(String id,  String gerichtSelected, Gericht gericht){
 
-        allAllergien.clear();
         DatabaseReference dbAllergien = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte").child(gerichtSelected).child("allergien");
         dbAllergien.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 if (snapshot.exists()) {
                     for (DataSnapshot snapshotAl : snapshot.getChildren()) {
                         String allergie = snapshotAl.getKey();
                         boolean allergieValue = snapshotAl.getValue(Boolean.class);
+                        //Gericht gericht = new Gericht();
 
                         if (allergieValue) {
                             allAllergien.add(allergie);
-                            //Toast.makeText(MainActivity.this, "Allergie: " + allergie, Toast.LENGTH_SHORT).show();
+                            gericht.setAllergien(allAllergien);
                         }
+
                     }
-                    gericht.setAllergien(allAllergien);
+
                 }
+
+
             }
+
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+
+
     }
 
-    private void getDataZutaten(String id, Gericht gericht, String gerichtSelceted){
 
-        allZutaten.clear();
+    private void getDataZutaten(String id, String gerichtSelceted){
+
         DatabaseReference dbZutaten = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte").child(gerichtSelceted).child("zutaten");
         dbZutaten.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -222,15 +234,25 @@ public class MainActivity extends AppCompatActivity {
 
                         if (zutatenValue) {
                             allZutaten.add(zutaten);
-                            Toast.makeText(MainActivity.this, "Zutaten: " + zutaten, Toast.LENGTH_SHORT).show();
+
                         }
                     }
-                    gericht.setZutaten(allZutaten);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
+
+
+
+
+    private void activityAufruf() {
+
+
+       Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+       intent.putExtra("Gerichte", (Serializable) gerichtList);
+       startActivity(intent);
+    }
+
 }

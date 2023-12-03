@@ -1,5 +1,7 @@
 package com.example.qrcodegenerator;
 
+import android.widget.Toast;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -50,6 +52,7 @@ public class Gericht implements Serializable {
     public void setZutaten(List<String> zutaten) {
         this.zutaten = zutaten;
     }
+
 
 
     @Override

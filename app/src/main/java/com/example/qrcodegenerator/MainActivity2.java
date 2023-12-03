@@ -1,44 +1,62 @@
 package com.example.qrcodegenerator;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import java.util.List;
+
 
 public class MainActivity2 extends AppCompatActivity {
 
-    Button buttonBack, buttonSave, buttonDelete;
-    EditText editTextGericht, editTextPreis, editTextAllergien, editTextZutaten;
-    Gericht selectedSpeisekarte;
+
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
-        buttonBack = findViewById(R.id.back_button);
-        editTextGericht = findViewById(R.id.editTextGericht);
-        editTextPreis = findViewById(R.id.editTextPreis);
-        editTextAllergien = findViewById(R.id.editTextAllergien);
-        editTextZutaten = findViewById(R.id.editTextZutaten);
+        setContentView(R.layout.recycler_view);
+
+        Intent intent = getIntent();
+        List<Gericht> gerichtList = (List<Gericht>) getIntent().getSerializableExtra("Gerichte");
 
 
-        editTextGericht.setEnabled(true);
-        editTextPreis.setEnabled(true);
-        editTextAllergien.setEnabled(true);
-        editTextZutaten.setEnabled(true);
-        selectedSpeisekarte = (Gericht) getIntent().getSerializableExtra("selectedSpeisekarte");
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        editTextGericht.setText(selectedSpeisekarte.getGerichtName()                                                              );
-        editTextPreis.setText(String.valueOf(selectedSpeisekarte.getPreis()));
+        GerichtAdapter gerichtAdapter = new GerichtAdapter(gerichtList);
+        recyclerView.setAdapter(gerichtAdapter);
 
 
-        buttonBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+
+
+
+
+
+
+
+        /*for (Gericht gericht : gerichtList) {
+            gerichtName.setText(gericht.getGerichtName());
+            gerichtPreis.setText(gericht.getPreis().toString());
+
+            for (String allergie : gericht.getAllergien()) {
+                gerichtInfo.setText(allergie);
             }
-        });
+
+        } */
+
+
+
+
+
     }
 }
