@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
     List<String> allAllergien = new ArrayList<>();
     List<String> allZutaten = new ArrayList<>();
     List<String> allGerichte = new ArrayList<>();
+    int index;
+
+
 
 
     private final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(new ScanContract(), result -> {
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readAllID() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Speisekarten");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Restaurants");
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getAllGerichte(String id) {
-        DatabaseReference dbGerichte = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id);
+        DatabaseReference dbGerichte = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte");
 
         dbGerichte.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -138,30 +141,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    int index = 0;
-    private void getDataGericht(String id) {
-        for(String gericht : allGerichte) {
 
-            DatabaseReference dbGerichte = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id).child(gericht);
+    private void getDataGericht(String id) {
+
+        Gericht[] gericht = new Gericht[allGerichte.size()];
+        index = 0;
+
+        for(String gerichtSelected : allGerichte) {
+
+            DatabaseReference dbGerichte = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte").child(gerichtSelected);
             dbGerichte.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()) {
-                        Gericht[] gericht = new Gericht[allGerichte.size()];
 
                         gericht[index] = new Gericht();  // Initialisierung eines neuen Gericht-Objekts
-                        gericht[index].setGerichtName(snapshot.child("Name").getValue(String.class));
-                        gericht[index].setPreis(snapshot.child("Preis").getValue(String.class));
-                        getDataAllergien(id, gericht[index]);
-                        getDataZutaten(id, gericht[index]);
+                        gericht[index].setGerichtName(snapshot.child("gericht").getValue(String.class));
+                        gericht[index].setPreis(snapshot.child("preis").getValue(Double.class));
+                        getDataAllergien(id, gericht[index], gerichtSelected);
+                        getDataZutaten(id, gericht[index], gerichtSelected);
 
 
                         if (gericht[index].getGerichtName() != null) {
-                            Toast.makeText(MainActivity.this, gericht[index].getGerichtName(), Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, "GerichtName: " + gericht[index].getGerichtName(), Toast.LENGTH_SHORT).show();
                         }
 
                         if (gericht[index].getPreis() != null) {
-                            Toast.makeText(MainActivity.this, gericht[index].getPreis(), Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, "GerichtPreis: " + gericht[index].getPreis().toString(), Toast.LENGTH_SHORT).show();
                         }
 
                         index++;
@@ -177,16 +183,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void getDataAllergien(String id, Gericht gericht){
+    private void getDataAllergien(String id, Gericht gericht, String gerichtSelected){
 
-        DatabaseReference dbAllergien = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id).child("Allergien");
+        allAllergien.clear();
+        DatabaseReference dbAllergien = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte").child(gerichtSelected).child("allergien");
         dbAllergien.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot snapshotAl : snapshot.getChildren()) {
                         String allergie = snapshotAl.getKey();
-                        allAllergien.add(allergie);
+                        boolean allergieValue = snapshotAl.getValue(Boolean.class);
+
+                        if (allergieValue) {
+                            allAllergien.add(allergie);
+                            //Toast.makeText(MainActivity.this, "Allergie: " + allergie, Toast.LENGTH_SHORT).show();
+                        }
                     }
                     gericht.setAllergien(allAllergien);
                 }
@@ -196,15 +208,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getDataZutaten(String id, Gericht gericht){
-        DatabaseReference dbZutaten = FirebaseDatabase.getInstance().getReference("Speisekarten").child(id).child("Zutaten");
+    private void getDataZutaten(String id, Gericht gericht, String gerichtSelceted){
+
+        allZutaten.clear();
+        DatabaseReference dbZutaten = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte").child(gerichtSelceted).child("zutaten");
         dbZutaten.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot snapshotAl : snapshot.getChildren()) {
                         String zutaten = snapshotAl.getKey();
-                        allZutaten.add(zutaten);
+                        boolean zutatenValue = snapshotAl.getValue(Boolean.class);
+
+                        if (zutatenValue) {
+                            allZutaten.add(zutaten);
+                            Toast.makeText(MainActivity.this, "Zutaten: " + zutaten, Toast.LENGTH_SHORT).show();
+                        }
                     }
                     gericht.setZutaten(allZutaten);
                 }

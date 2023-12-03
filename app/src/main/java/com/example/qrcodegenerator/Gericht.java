@@ -6,12 +6,12 @@ import java.util.List;
 public class Gericht implements Serializable {
     private String id, gericht;
     private List<String> allergien, zutaten;
-    private String preis;
+    private Double preis;
 
 
     public Gericht() {}
 
-    public Gericht(String id, String preis, String gericht, List<String> allergien, List<String> zutaten) {
+    public Gericht(String id, Double preis, String gericht, List<String> allergien, List<String> zutaten) {
         this.id = id;
         this.preis = preis;
         this.gericht = gericht;
@@ -19,11 +19,11 @@ public class Gericht implements Serializable {
         this.zutaten = zutaten;
     }
 
-    public String getPreis() {
+    public Double getPreis() {
         return preis;
     }
 
-    public void setPreis(String preis) {
+    public void setPreis(Double preis) {
         this.preis = preis;
     }
 
