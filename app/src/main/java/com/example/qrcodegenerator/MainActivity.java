@@ -265,10 +265,6 @@ public class MainActivity extends AppCompatActivity {
         void onComplete();
     }
 
-
-
-
-
     private void activityAufruf() {
 
 
@@ -276,5 +272,4 @@ public class MainActivity extends AppCompatActivity {
        intent.putExtra("Gerichte", (Serializable) gerichtList);
        startActivity(intent);
     }
-
 }

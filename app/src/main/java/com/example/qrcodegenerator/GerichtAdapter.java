@@ -3,6 +3,7 @@ package com.example.qrcodegenerator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,7 +30,11 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
     public void onBindViewHolder(@NonNull GerichtViewHolder holder, int position) {
         Gericht gericht = gerichtList.get(position);
         holder.textViewGerichtName.setText(gericht.getGerichtName());
-        holder.textViewGerichtPreis.setText(String.valueOf(gericht.getPreis()));
+
+        double preis = gericht.getPreis();
+        String preisString = String.format("%.2f", preis);
+        String formattedPreis = preisString.replace('.', ',') + "€";
+        holder.textViewGerichtPreis.setText(formattedPreis);
 
 
         /*StringBuilder allergienText = new StringBuilder();
@@ -40,9 +45,20 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
 
         StringBuilder zutatenText = new StringBuilder();
         for (String zutat : gericht.getZutaten()) {
-            zutatenText.append(zutat).append(", ");
+            zutatenText.append(zutat.substring(0, 1).toUpperCase() + zutat.substring(1)).append(", ");
         }
+        zutatenText.deleteCharAt(zutatenText.length()-2);
         holder.textViewInfo.setText(zutatenText.toString());
+
+        holder.gerichtLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle für die Auswahl
+                v.setSelected(!v.isSelected());
+            }
+        });
+
+
     }
 
     @Override
@@ -54,12 +70,14 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         TextView textViewGerichtName;
         TextView textViewGerichtPreis;
         TextView textViewInfo;
+        LinearLayout gerichtLayout;
 
         GerichtViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewGerichtName = itemView.findViewById(R.id.textViewGerichtName);
             textViewGerichtPreis = itemView.findViewById(R.id.textViewGerichtPreis);
             textViewInfo = itemView.findViewById(R.id.textViewAdditionalInfo);
+            gerichtLayout = itemView.findViewById(R.id.gerichtLayout);
         }
     }
 }

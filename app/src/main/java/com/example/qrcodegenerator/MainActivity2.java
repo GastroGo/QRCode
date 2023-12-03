@@ -1,25 +1,20 @@
 package com.example.qrcodegenerator;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.view.View;
+import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.List;
 
 
 public class MainActivity2 extends AppCompatActivity {
-
-
-
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,28 +30,5 @@ public class MainActivity2 extends AppCompatActivity {
 
         GerichtAdapter gerichtAdapter = new GerichtAdapter(gerichtList);
         recyclerView.setAdapter(gerichtAdapter);
-
-
-
-
-
-
-
-
-
-        /*for (Gericht gericht : gerichtList) {
-            gerichtName.setText(gericht.getGerichtName());
-            gerichtPreis.setText(gericht.getPreis().toString());
-
-            for (String allergie : gericht.getAllergien()) {
-                gerichtInfo.setText(allergie);
-            }
-
-        } */
-
-
-
-
-
     }
 }
