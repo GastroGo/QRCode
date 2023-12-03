@@ -32,11 +32,17 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         holder.textViewGerichtPreis.setText(String.valueOf(gericht.getPreis()));
 
 
-        /* StringBuilder zutatenText = new StringBuilder();
-        for (String zutat : gericht.getAllergien()) {
+        /*StringBuilder allergienText = new StringBuilder();
+        for (String allergie : gericht.getAllergien()) {
+            allergienText.append(allergie).append(", ");
+        }
+        holder.textViewInfo.setText(allergienText.toString()); */
+
+        StringBuilder zutatenText = new StringBuilder();
+        for (String zutat : gericht.getZutaten()) {
             zutatenText.append(zutat).append(", ");
         }
-        holder.textViewInfo.setText(zutatenText.toString()); */
+        holder.textViewInfo.setText(zutatenText.toString());
     }
 
     @Override
