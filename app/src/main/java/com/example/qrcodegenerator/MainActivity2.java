@@ -11,7 +11,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     Button buttonBack, buttonSave, buttonDelete;
     EditText editTextGericht, editTextPreis, editTextAllergien, editTextZutaten;
-    Speisekarte selectedSpeisekarte;
+    Gericht selectedSpeisekarte;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +28,11 @@ public class MainActivity2 extends AppCompatActivity {
         editTextPreis.setEnabled(true);
         editTextAllergien.setEnabled(true);
         editTextZutaten.setEnabled(true);
-        selectedSpeisekarte = (Speisekarte) getIntent().getSerializableExtra("selectedSpeisekarte");
+        selectedSpeisekarte = (Gericht) getIntent().getSerializableExtra("selectedSpeisekarte");
 
-        editTextGericht.setText(selectedSpeisekarte.getGericht());
+        editTextGericht.setText(selectedSpeisekarte.getGerichtName()                                                              );
         editTextPreis.setText(String.valueOf(selectedSpeisekarte.getPreis()));
-        editTextAllergien.setText(selectedSpeisekarte.getAllergien());
-        editTextZutaten.setText(selectedSpeisekarte.getZutaten());
+
 
         buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
