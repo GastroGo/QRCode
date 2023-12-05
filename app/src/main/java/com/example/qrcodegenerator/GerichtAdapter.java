@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,6 +56,22 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
             public void onClick(View v) {
                 // Toggle für die Auswahl
                 v.setSelected(!v.isSelected());
+
+                // Aktuelle Position des Gerichts
+                int position = holder.getAdapterPosition();
+                boolean selected = false;
+
+                // Prüfe, ob die Position gültig ist
+                if (position != RecyclerView.NO_POSITION) {
+                    Gericht selectedGericht = gerichtList.get(position);
+
+                    if (v.isSelected()) {
+                        selectedGericht.setSelected(true);
+                    } else if (!v.isSelected()) {
+                        selectedGericht.setSelected(false);
+                    }
+                }
+
             }
         });
 

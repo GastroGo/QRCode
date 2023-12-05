@@ -9,16 +9,18 @@ public class Gericht implements Serializable {
     private String id, gericht;
     private List<String> allergien, zutaten;
     private Double preis;
+    private boolean isSelected;
 
 
     public Gericht() {}
 
-    public Gericht(String id, Double preis, String gericht, List<String> allergien, List<String> zutaten) {
+    public Gericht(String id, Double preis, String gericht, List<String> allergien, List<String> zutaten, boolean isSelected) {
         this.id = id;
         this.preis = preis;
         this.gericht = gericht;
         this.allergien = allergien;
         this.zutaten = zutaten;
+        this.isSelected = isSelected;
     }
 
     public Double getPreis() {
@@ -53,7 +55,13 @@ public class Gericht implements Serializable {
         this.zutaten = zutaten;
     }
 
+    public boolean isSelected() {
+        return isSelected;
+    }
 
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
 
     @Override
     public String toString() {

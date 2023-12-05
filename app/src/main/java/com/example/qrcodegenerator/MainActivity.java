@@ -37,13 +37,15 @@ public class MainActivity extends AppCompatActivity {
     int index;
 
 
-
+    public String idTable;
 
     private final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() == null) {
             Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
         } else {
-            checkRestaurantID(result.getContents());
+            String idScanned = result.getContents().substring(0,result.getContents().length()-3);
+            idTable = result.getContents().substring(result.getContents().length()-3);
+            checkRestaurantID(idScanned);
         }
     });
 
@@ -144,10 +146,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-
-
-
     private void getDataGericht(String id) {
 
         Gericht[] gericht = new Gericht[allGerichte.size()];
@@ -165,40 +163,28 @@ public class MainActivity extends AppCompatActivity {
                         gericht[index].setGerichtName(snapshot.child("gericht").getValue(String.class));
                         gericht[index].setPreis(snapshot.child("preis").getValue(Double.class));
 
-
-
                         getDataZutaten(id, gerichtSelected, gericht[index], new Callback() {
                             @Override
                             public void onComplete() {
                                 index++;
                                 zutatenTasksCompleted++;
                                 if (index == allGerichte.size() && zutatenTasksCompleted == allGerichte.size()) {
-                                    activityAufruf();
+                                    activityAufruf(id);
                                 }
                             }
                         });
-
                         gerichtList.add(gericht[index]);
-
-
-
-
-
                     }
 
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-
                 }
             });
         }
-
     }
 
-
     private int tasksCompleted = 0;
-
     private void getDataAllergien(String id, String gerichtSelected, Gericht gericht, Callback callback) {
         DatabaseReference dbAllergien = FirebaseDatabase.getInstance()
                 .getReference("Restaurants").child(id).child("speisekarte")
@@ -229,10 +215,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-
-
-
     private int zutatenTasksCompleted = 0;
     private void getDataZutaten(String id, String gerichtSelceted,Gericht gericht, Callback callback) {
         DatabaseReference dbZutaten = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte").child(gerichtSelceted).child("zutaten");
@@ -261,15 +243,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     interface Callback {
         void onComplete();
     }
 
-    private void activityAufruf() {
+    private void activityAufruf(String id) {
 
 
        Intent intent = new Intent(MainActivity.this, MainActivity2.class);
        intent.putExtra("Gerichte", (Serializable) gerichtList);
+       intent.putExtra("idTable", idTable);
+       intent.putExtra("id", id);
        startActivity(intent);
     }
 }
