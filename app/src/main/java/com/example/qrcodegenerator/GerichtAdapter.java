@@ -1,8 +1,11 @@
 package com.example.qrcodegenerator;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +22,7 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
     public GerichtAdapter(List<Gericht> gerichtList) {
         this.gerichtList = gerichtList;
     }
+
 
     @NonNull
     @Override
@@ -37,7 +41,6 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         String formattedPreis = preisString.replace('.', ',') + "€";
         holder.textViewGerichtPreis.setText(formattedPreis);
 
-
         /*StringBuilder allergienText = new StringBuilder();
         for (String allergie : gericht.getAllergien()) {
             allergienText.append(allergie).append(", ");
@@ -51,6 +54,7 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         zutatenText.deleteCharAt(zutatenText.length()-2);
         holder.textViewInfo.setText(zutatenText.toString());
 
+
         holder.gerichtLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,7 +63,6 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
 
                 // Aktuelle Position des Gerichts
                 int position = holder.getAdapterPosition();
-                boolean selected = false;
 
                 // Prüfe, ob die Position gültig ist
                 if (position != RecyclerView.NO_POSITION) {
@@ -67,11 +70,36 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
 
                     if (v.isSelected()) {
                         selectedGericht.setSelected(true);
+                        holder.amount.setText("1");
+                        gericht.setAmount(1);
                     } else if (!v.isSelected()) {
                         selectedGericht.setSelected(false);
+                        holder.amount.setText("0");
                     }
                 }
 
+            }
+        });
+
+        holder.amount.setText(String.valueOf(gericht.getAmount()));
+
+        holder.amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    int quantity = Integer.parseInt(editable.toString());
+                    gericht.setAmount(quantity);
+                } catch (NumberFormatException e) {
+                    // Fehler beim Parsen der Zahl
+                }
             }
         });
 
@@ -88,6 +116,7 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         TextView textViewGerichtPreis;
         TextView textViewInfo;
         LinearLayout gerichtLayout;
+        EditText amount;
 
         GerichtViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,6 +124,7 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
             textViewGerichtPreis = itemView.findViewById(R.id.textViewGerichtPreis);
             textViewInfo = itemView.findViewById(R.id.textViewAdditionalInfo);
             gerichtLayout = itemView.findViewById(R.id.gerichtLayout);
+            amount = itemView.findViewById(R.id.amount);
         }
     }
 }

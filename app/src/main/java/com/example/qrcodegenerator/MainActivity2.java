@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,10 @@ public class MainActivity2 extends AppCompatActivity {
         String idRestaurant = getIntent().getStringExtra("id");
         String idSelectedTable = getIntent().getStringExtra("idTable");
 
+        for (Gericht gericht : gerichtList) {
+            gericht.setAmount(0);
+        }
+
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -67,7 +72,13 @@ public class MainActivity2 extends AppCompatActivity {
 
         int index = 1;
         for (Gericht gericht : gerichtList) {
-            bestellungenRef.child("G" + index).setValue(gericht.isSelected());
+            if (gericht.isSelected()) {
+
+                bestellungenRef.child("G" + index).setValue(gericht.getAmount());
+
+            } else {
+                bestellungenRef.child("G" + index).setValue(0);
+            }
             index++;
         }
     }
