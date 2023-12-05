@@ -8,14 +8,13 @@
     android:layout_marginTop="10dp"
     android:background="@drawable/selector_gericht_background">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp">
+        android:layout_marginTop="15dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="30dp">
 
 
         <TextView
@@ -32,7 +31,7 @@
             android:id="@+id/textViewGerichtPreis"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:textColor="@color/black"
             android:text="Preis" />
 
@@ -44,7 +43,7 @@
         android:layout_height="wrap_content"
         android:textColor="#3E3C3C"
         android:text="Zutaten"
-        android:layout_marginTop="4dp"
-        android:paddingLeft="20dp"/>
+        android:layout_marginTop="0dp"
+        android:paddingLeft="15dp"/>
 
 </LinearLayout>
