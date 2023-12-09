@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:orientation="horizontal">
+
+
+
+        <EditText
+            android:id="@+id/textViewOrderAmount"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"/>
+
+        <TextView
+            android:id="@+id/textViewOrderGerichtName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="GerichtName"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"/>
+
+        <TextView
+            android:id="@+id/textViewOrderGerichtPreis"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="Preis"
+            android:layout_marginRight="28dp"/>
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="30dp"
+            android:text="D" />
+
+</LinearLayout>
