@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity {
     List<String> allGerichte = new ArrayList<>();
     List<Gericht> gerichtList = new ArrayList<>();
     int index;
-
-
     public String idTable;
 
     private final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(new ScanContract(), result -> {
@@ -45,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             String idScanned = result.getContents().substring(0,result.getContents().length()-3);
             idTable = result.getContents().substring(result.getContents().length()-3);
-            checkRestaurantID(idScanned);
+            getAllGerichte(idScanned);
         }
     });
 
@@ -63,27 +61,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initBinding();
         initViews();
-        readAllID();
     }
 
-    private void readAllID() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Restaurants");
-
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String id = snapshot.getKey();
-                    allIds.add(id);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Error reading IDs from Firebase", databaseError.toException());
-            }
-        });
-    }
 
     private void showCamera() {
         ScanOptions options = new ScanOptions();
@@ -119,13 +98,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
     }
 
-    private void checkRestaurantID(String idDatabase) {
-        for (String id : allIds) {
-            if (id.equals(idDatabase)) {
-                getAllGerichte(id);
-            }
-        }
-    }
+    /* <-------------------------------------------------> */
 
     private void getAllGerichte(String id) {
         DatabaseReference dbGerichte = FirebaseDatabase.getInstance().getReference("Restaurants").child(id).child("speisekarte");
@@ -249,8 +222,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void activityAufruf(String id) {
-
-
        Intent intent = new Intent(MainActivity.this, MainActivity2.class);
        intent.putExtra("Gerichte", (Serializable) gerichtList);
        intent.putExtra("idTable", idTable);

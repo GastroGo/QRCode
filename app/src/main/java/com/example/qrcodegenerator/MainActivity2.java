@@ -58,31 +58,42 @@ public class MainActivity2 extends AppCompatActivity {
                 showDialog(selectedGerichte);
             }
         });
-
-
     }
 
-    private void showDialog(List <Gericht> selectedGerichte) {
-        // Erstellen Sie ein Dialog-Objekt
+    private void setOrders(List<Gericht> gerichtList) {
+        selectedGerichte.clear();
+        for (Gericht gericht : gerichtList) {
+            if (gericht.isSelected() && gericht.getAmount() > 0) {
+                selectedGerichte.add(gericht);
+            }
+        }
+    }
+
+    private void showDialog(List<Gericht> selectedGerichte) {
         Dialog dialog = new Dialog(this);
-        // Setzen Sie das Layout des Dialogs
         dialog.setContentView(R.layout.dialog_window);
 
-        // Finden Sie die RecyclerView im Dialog-Layout
         RecyclerView recyclerDialogView = dialog.findViewById(R.id.recyclerDialogView);
 
-        // Setzen Sie das LayoutManager und den Adapter für die RecyclerView
         recyclerDialogView.setLayoutManager(new LinearLayoutManager(this));
         OrderAdapter orderAdapter = new OrderAdapter(selectedGerichte);
         recyclerDialogView.setAdapter(orderAdapter);
 
-        // Berechnen Sie die Höhe des Dialogs basierend auf der Anzahl der ausgewählten Gerichte
         int dialogHeight = calculateDialogHeight(selectedGerichte);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, dialogHeight);
 
-        // Zeigen Sie den Dialog an
-        dialog.show();
+        if (selectedGerichte.size() > 0) {
+            dialog.show();
+        } else {
+            Toast.makeText(this, "Keine Gerichte zur Bestellung hinzugefügt", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();  // Schließe den Dialog, wenn die Liste leer ist
+        }
+
+        // Wird aufgerufen, wenn die Liste leer wird
+        // Schließe den Dialog, wenn die Liste leer ist
+        orderAdapter.setOnListEmptyListener(dialog::dismiss);
     }
+
 
     private int calculateDialogHeight(List<Gericht> selectedGerichte) {
         // Hier können Sie die Höhe des Dialogs basierend auf der Anzahl der Gerichte anpassen.
@@ -90,18 +101,8 @@ public class MainActivity2 extends AppCompatActivity {
         int itemHeight = 100;
         int minHeight = 200;
         int buttonHeigth = 200;
-        int totalHeight = minHeight + buttonHeigth*(selectedGerichte.size()/2) + selectedGerichte.size() * itemHeight;
+        int totalHeight = minHeight + (selectedGerichte.size()+2) * itemHeight;
         return Math.min(totalHeight, getResources().getDisplayMetrics().heightPixels);
-    }
-
-
-    private void setOrders(List<Gericht> gerichtList) {
-        selectedGerichte.clear();
-        for (Gericht gericht : gerichtList) {
-            if (gericht.isSelected()) {
-                selectedGerichte.add(gericht);
-            }
-        }
     }
 }
 

@@ -5,6 +5,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -41,70 +44,51 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         String formattedPreis = preisString.replace('.', ',') + "€";
         holder.textViewGerichtPreis.setText(formattedPreis);
 
-        /*StringBuilder allergienText = new StringBuilder();
-        for (String allergie : gericht.getAllergien()) {
-            allergienText.append(allergie).append(", ");
-        }
-        holder.textViewInfo.setText(allergienText.toString()); */
-
         StringBuilder zutatenText = new StringBuilder();
         for (String zutat : gericht.getZutaten()) {
             zutatenText.append(zutat.substring(0, 1).toUpperCase() + zutat.substring(1)).append(", ");
         }
-        zutatenText.deleteCharAt(zutatenText.length()-2);
+        zutatenText.deleteCharAt(zutatenText.length() - 2);
         holder.textViewInfo.setText(zutatenText.toString());
 
-
-        holder.gerichtLayout.setOnClickListener(new View.OnClickListener() {
+        holder.btnPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle für die Auswahl
-                v.setSelected(!v.isSelected());
-
-                // Aktuelle Position des Gerichts
                 int position = holder.getAdapterPosition();
+                Gericht selectedGericht = gerichtList.get(position);
+                if (position != RecyclerView.NO_POSITION) {
+                    selectedGericht.setSelected(true);
+                    selectedGericht.setAmount(selectedGericht.getAmount() + 1);
 
-                // Prüfe, ob die Position gültig ist
+                    holder.gerichtLayout.setSelected(true);
+                    holder.amount.setText(String.valueOf(selectedGericht.getAmount()));
+                }
+
+            }
+        });
+
+        holder.btnMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = holder.getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
                     Gericht selectedGericht = gerichtList.get(position);
 
-                    if (v.isSelected()) {
-                        selectedGericht.setSelected(true);
-                        holder.amount.setText("1");
-                        gericht.setAmount(1);
-                    } else if (!v.isSelected()) {
-                        selectedGericht.setSelected(false);
-                        holder.amount.setText("0");
+                    if (selectedGericht.getAmount() > 0) {
+                        selectedGericht.setAmount(selectedGericht.getAmount() - 1);
                     }
-                }
 
-            }
-        });
-
-        holder.amount.setText(String.valueOf(gericht.getAmount()));
-
-        holder.amount.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                try {
-                    int quantity = Integer.parseInt(editable.toString());
-                    gericht.setAmount(quantity);
-                } catch (NumberFormatException e) {
-                    // Fehler beim Parsen der Zahl
+                    if (selectedGericht.getAmount() == 0) {
+                        selectedGericht.setSelected(false);
+                        holder.gerichtLayout.setSelected(false);
+                    }
+                    holder.amount.setText(String.valueOf(selectedGericht.getAmount()));
                 }
             }
         });
-
-
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -116,7 +100,9 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         TextView textViewGerichtPreis;
         TextView textViewInfo;
         LinearLayout gerichtLayout;
-        EditText amount;
+        TextView amount;
+        FloatingActionButton btnMinus;
+        FloatingActionButton btnPlus;
 
         GerichtViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -125,6 +111,8 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
             textViewInfo = itemView.findViewById(R.id.textViewAdditionalInfo);
             gerichtLayout = itemView.findViewById(R.id.gerichtLayout);
             amount = itemView.findViewById(R.id.amount);
+            btnMinus = itemView.findViewById(R.id.btnMinus);
+            btnPlus = itemView.findViewById(R.id.btnPlus);
         }
     }
 }
