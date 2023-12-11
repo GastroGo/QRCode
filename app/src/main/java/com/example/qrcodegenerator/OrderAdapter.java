@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.os.Handler;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -57,17 +60,29 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             @Override
             public void afterTextChanged(Editable editable) {
                 try {
+                    if (editable.length() == 0) {
+                        // Wenn der EditText leer ist, setze den Amount auf 0 und zeige einen Toast an
+                        gericht.setFinalAmount(0);
+                        new Handler().postDelayed(() -> {
+                            Toast.makeText(holder.itemView.getContext(), "Menge darf nicht leer sein", Toast.LENGTH_SHORT).show();
+                        }, 4000);
+                        return;
+                    }
+
                     int amount = Integer.parseInt(editable.toString());
+
                     // Begrenze die eingegebene Menge auf 99
                     if (amount > 99) {
                         holder.editTextAmount.setText("99");
                         amount = 99;
                     }
+
                     gericht.setFinalAmount(amount);
                     holder.textViewGerichtPreis.setText(String.format("%.2f€", gericht.getPreis() * amount));
 
                 } catch (NumberFormatException e) {
                     // Fehler beim Parsen der Zahl
+                    Toast.makeText(holder.itemView.getContext(), "Ungültige Eingabe", Toast.LENGTH_SHORT).show();
                 }
             }
         });
