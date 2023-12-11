@@ -1,5 +1,6 @@
 package com.example.qrcodegenerator;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,10 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity2 extends AppCompatActivity {
+public class MainActivity2 extends AppCompatActivity implements AmountChangeListener{
 
     List <String> allTableIDs = new ArrayList<>();
     List <Gericht> selectedGerichte = new ArrayList<>();
+
+    private GerichtAdapter gerichtAdapter;
+    private OrderAdapter orderAdapter;
+    private Dialog currentDialog;
+
 
 
     @Override
@@ -43,6 +50,9 @@ public class MainActivity2 extends AppCompatActivity {
         String idRestaurant = getIntent().getStringExtra("id");
         String idSelectedTable = getIntent().getStringExtra("idTable");
 
+        TextView tableNumber = findViewById(R.id.tableNumber);
+        tableNumber.setText("Tischnummer: " + String.valueOf(idSelectedTable));
+
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -54,13 +64,21 @@ public class MainActivity2 extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setOrders(gerichtList);
-                showDialog(selectedGerichte);
+                setGerichte(gerichtList);
+                copyAmount(selectedGerichte);
+                showDialog(selectedGerichte, idRestaurant, idSelectedTable, gerichtList);
             }
         });
+
     }
 
-    private void setOrders(List<Gericht> gerichtList) {
+    @Override
+    public void onAmountChanged() {
+        updateTotalPrice(currentDialog);
+    }
+
+
+    private void setGerichte(List<Gericht> gerichtList) {
         selectedGerichte.clear();
         for (Gericht gericht : gerichtList) {
             if (gericht.isSelected() && gericht.getAmount() > 0) {
@@ -69,7 +87,14 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
-    private void showDialog(List<Gericht> selectedGerichte) {
+
+    private void copyAmount(List<Gericht> selectedGerichte) {
+        for (Gericht gericht : selectedGerichte){
+            gericht.setFinalAmount(gericht.getAmount());
+        }
+    }
+
+    private void showDialog(List<Gericht> selectedGerichte, String idRestaurant, String idSelectedTable, List<Gericht> gerichtList) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_window);
 
@@ -79,18 +104,31 @@ public class MainActivity2 extends AppCompatActivity {
         OrderAdapter orderAdapter = new OrderAdapter(selectedGerichte);
         recyclerDialogView.setAdapter(orderAdapter);
 
+        for (Gericht gericht : selectedGerichte) {
+            gericht.setAmountChangeListener(this);
+        }
+
         int dialogHeight = calculateDialogHeight(selectedGerichte);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, dialogHeight);
 
+        currentDialog = dialog;
+
         if (selectedGerichte.size() > 0) {
+            updateTotalPrice(dialog);
             dialog.show();
         } else {
             Toast.makeText(this, "Keine Gerichte zur Bestellung hinzugefügt", Toast.LENGTH_SHORT).show();
             dialog.dismiss();  // Schließe den Dialog, wenn die Liste leer ist
         }
 
-        // Wird aufgerufen, wenn die Liste leer wird
-        // Schließe den Dialog, wenn die Liste leer ist
+        Button orderBtn = dialog.findViewById(R.id.orderBtn);
+        if (orderBtn != null) {
+            orderBtn.setOnClickListener(v -> {
+                setOrders(idRestaurant, idSelectedTable, gerichtList);
+                dialog.dismiss();
+            });
+        }
+
         orderAdapter.setOnListEmptyListener(dialog::dismiss);
     }
 
@@ -98,11 +136,43 @@ public class MainActivity2 extends AppCompatActivity {
     private int calculateDialogHeight(List<Gericht> selectedGerichte) {
         // Hier können Sie die Höhe des Dialogs basierend auf der Anzahl der Gerichte anpassen.
         // Beispiel: Hier wird die Höhe auf 400dp plus 100dp für jeden ausgewählten Artikel festgelegt.
-        int itemHeight = 100;
+        int itemHeight = 150;
         int minHeight = 200;
-        int buttonHeigth = 200;
         int totalHeight = minHeight + (selectedGerichte.size()+2) * itemHeight;
         return Math.min(totalHeight, getResources().getDisplayMetrics().heightPixels);
     }
+
+    private void setOrders(String idRestaurant, String idSelectedTable, List<Gericht> gerichtList) {
+        DatabaseReference bestellungenRef = FirebaseDatabase.getInstance()
+                .getReference("Restaurants")
+                .child(idRestaurant)
+                .child("tische")
+                .child(idSelectedTable)
+                .child("bestellungen");
+        int index = 1;
+        for (Gericht gericht : gerichtList) {
+            bestellungenRef.child("G" + index).setValue(gericht.getFinalAmount());
+            index++;
+        }
+    }
+
+
+    private void updateTotalPrice(Dialog dialog) {
+        TextView totalPrice = dialog.findViewById(R.id.totalPrice);
+
+        double totalPriceValue = 0;
+
+        for (Gericht gericht : selectedGerichte) {
+            totalPriceValue += gericht.getPreis() * gericht.getFinalAmount();
+        }
+
+        // Aktualisieren Sie das totalPrice TextView
+        if (!selectedGerichte.isEmpty()) {
+            totalPrice.setText(String.format("%.2f€", totalPriceValue));
+        } else {
+            totalPrice.setText("");
+        }
+    }
+
 }
 

@@ -1,5 +1,7 @@
 package com.example.qrcodegenerator;
 
+import android.widget.Toast;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -9,6 +11,18 @@ public class Gericht implements Serializable {
     private Double preis;
     private boolean isSelected = false;
     private int amount;
+    private int finalAmount = 0;
+    private AmountChangeListener amountChangeListener;
+
+    public void setAmountChangeListener(AmountChangeListener listener) {
+        this.amountChangeListener = listener;
+    }
+
+    private void notifyOnAmountChanged() {
+        if (amountChangeListener != null) {
+            amountChangeListener.onAmountChanged();
+        }
+    }
 
     public Gericht(){}
 
@@ -63,14 +77,14 @@ public class Gericht implements Serializable {
     }
 
     public int getAmount() {return amount;}
-
     public void setAmount(int amount) {this.amount = amount;}
 
-    @Override
-    public String toString() {
-        return "Gericht: " + gericht + '\n' +
-                "Preis: " + preis + '\n' +
-                "Allergien: " + allergien + '\n' +
-                "Zutaten: " + zutaten + '\n';
+    public int getFinalAmount() {return finalAmount;}
+
+    public void setFinalAmount(int finalAmount) {
+        this.finalAmount = finalAmount;
+        notifyOnAmountChanged();
     }
+
+
 }

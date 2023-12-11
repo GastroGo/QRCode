@@ -26,7 +26,6 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         this.gerichtList = gerichtList;
     }
 
-
     @NonNull
     @Override
     public GerichtViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -43,6 +42,8 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         String preisString = String.format("%.2f", preis);
         String formattedPreis = preisString.replace('.', ',') + "€";
         holder.textViewGerichtPreis.setText(formattedPreis);
+
+
 
         StringBuilder zutatenText = new StringBuilder();
         for (String zutat : gericht.getZutaten()) {
@@ -103,6 +104,7 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         TextView amount;
         FloatingActionButton btnMinus;
         FloatingActionButton btnPlus;
+
 
         GerichtViewHolder(@NonNull View itemView) {
             super(itemView);

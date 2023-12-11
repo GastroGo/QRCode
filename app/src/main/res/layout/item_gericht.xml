@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="22sp"
-            android:textColor="@color/black"
+            android:textColor="@color/light_third"
             android:textStyle="bold"
             android:text="Name" />
 
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="9dp"
-            android:textColor="@color/black"
+            android:textColor="@color/light_third"
             android:text="Preis" />
 
 
@@ -49,7 +49,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#3E3C3C"
+            android:textColor="#5A7A62"
             android:text="Zutaten"
             android:layout_marginTop="0dp"
             android:paddingLeft="15dp"/>
@@ -60,6 +60,8 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_minus_icon"
             android:outlineSpotShadowColor="@color/zxing_transparent"
+            android:backgroundTint="@color/light_second"
+            app:borderWidth="0dp"
             app:fabCustomSize="30dp"
             android:layout_marginLeft="70dp"/>
 
@@ -68,6 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="1dp"
+            android:textColor="#5A7A62"
             android:text="0" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -76,6 +79,8 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:src="@drawable/ic_plus_icon"
+            android:backgroundTint="@color/light_second"
+            app:borderWidth="0dp"
             android:outlineSpotShadowColor="@color/zxing_transparent"
             app:fabCustomSize="30dp" />
     </LinearLayout>

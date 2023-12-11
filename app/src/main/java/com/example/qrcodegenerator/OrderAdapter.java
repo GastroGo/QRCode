@@ -1,30 +1,26 @@
 package com.example.qrcodegenerator;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
+
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
     private List<Gericht> selectedGerichte;
+    private OnListEmptyListener onListEmptyListener;
 
     public OrderAdapter(List<Gericht> selectedGerichte) {
         this.selectedGerichte = selectedGerichte;
     }
-
-    private OnListEmptyListener onListEmptyListener;
 
     public interface OnListEmptyListener {
         void onListEmpty();
@@ -45,9 +41,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
         Gericht gericht = selectedGerichte.get(position);
 
-        // Setzen Sie die Daten in die Ansichtselemente
         holder.textViewGerichtName.setText(gericht.getGerichtName());
-        holder.textViewGerichtPreis.setText(String.format("%.2f€", gericht.getPreis()*gericht.getAmount()));
+        holder.textViewGerichtPreis.setText(String.format("%.2f€", gericht.getPreis() * gericht.getAmount()));
         holder.editTextAmount.setText(String.valueOf(gericht.getAmount()));
 
         holder.editTextAmount.addTextChangedListener(new TextWatcher() {
@@ -63,12 +58,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             public void afterTextChanged(Editable editable) {
                 try {
                     int amount = Integer.parseInt(editable.toString());
-                    holder.textViewGerichtPreis.setText(String.format("%.2f€", gericht.getPreis()*amount));
+                    // Begrenze die eingegebene Menge auf 99
+                    if (amount > 99) {
+                        holder.editTextAmount.setText("99");
+                        amount = 99;
+                    }
+                    gericht.setFinalAmount(amount);
+                    holder.textViewGerichtPreis.setText(String.format("%.2f€", gericht.getPreis() * amount));
+
                 } catch (NumberFormatException e) {
                     // Fehler beim Parsen der Zahl
                 }
             }
-
         });
 
         holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +77,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 Gericht removeGericht = selectedGerichte.get(position);
+                removeGericht.setFinalAmount(0);
                 selectedGerichte.remove(removeGericht);
                 notifyItemRemoved(position);
 
