@@ -49,7 +49,7 @@ public class GerichtAdapter extends RecyclerView.Adapter<GerichtAdapter.GerichtV
         for (String zutat : gericht.getZutaten()) {
             zutatenText.append(zutat.substring(0, 1).toUpperCase() + zutat.substring(1)).append(", ");
         }
-        zutatenText.deleteCharAt(zutatenText.length() - 2);
+        zutatenText.deleteCharAt(zutatenText.length()-2);
         holder.textViewInfo.setText(zutatenText.toString());
 
         holder.btnPlus.setOnClickListener(new View.OnClickListener() {

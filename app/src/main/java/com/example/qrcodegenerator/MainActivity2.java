@@ -29,11 +29,8 @@ import java.util.List;
 
 public class MainActivity2 extends AppCompatActivity implements AmountChangeListener{
 
-    List <String> allTableIDs = new ArrayList<>();
     List <Gericht> selectedGerichte = new ArrayList<>();
 
-    private GerichtAdapter gerichtAdapter;
-    private OrderAdapter orderAdapter;
     private Dialog currentDialog;
 
 
@@ -147,11 +144,12 @@ public class MainActivity2 extends AppCompatActivity implements AmountChangeList
                 .getReference("Restaurants")
                 .child(idRestaurant)
                 .child("tische")
-                .child(idSelectedTable)
+                .child("T" + idSelectedTable)
                 .child("bestellungen");
         int index = 1;
         for (Gericht gericht : gerichtList) {
-            bestellungenRef.child("G" + index).setValue(gericht.getFinalAmount());
+            String formattedIndex = String.format("%03d", index);
+            bestellungenRef.child("G" + formattedIndex).setValue(gericht.getFinalAmount());
             index++;
         }
     }

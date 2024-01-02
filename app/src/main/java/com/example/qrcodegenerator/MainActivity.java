@@ -30,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private final List<String> allIds = new ArrayList<>();
-    //List<String> allZutaten = new ArrayList<>();
-    //List<String> allAllergien = new ArrayList<>();
     List<String> allGerichte = new ArrayList<>();
     List<Gericht> gerichtList = new ArrayList<>();
     int index;
@@ -132,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()) {
 
+
                         gericht[index] = new Gericht();  // Initialisierung eines neuen Gericht-Objekts
                         gericht[index].setGerichtName(snapshot.child("gericht").getValue(String.class));
                         gericht[index].setPreis(snapshot.child("preis").getValue(Double.class));
@@ -205,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     gericht.setZutaten(allZutaten);
+
                     callback.onComplete();
                 }
             }
