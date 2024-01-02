@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class QRCodeReader extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private final List<String> allIds = new ArrayList<>();
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void activityAufruf(String id) {
-       Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+       Intent intent = new Intent(QRCodeReader.this, OrderManager.class);
        intent.putExtra("Gerichte", (Serializable) gerichtList);
        intent.putExtra("idTable", idTable);
        intent.putExtra("id", id);
